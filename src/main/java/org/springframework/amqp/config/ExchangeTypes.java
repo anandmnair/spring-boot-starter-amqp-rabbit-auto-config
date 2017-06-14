@@ -1,8 +1,5 @@
 package org.springframework.amqp.config;
 
-import lombok.Getter;
-
-@Getter
 public enum ExchangeTypes {
 	DIRECT("direct"),
 	TOPIC("topic"),
@@ -11,6 +8,10 @@ public enum ExchangeTypes {
 	
 	private String value;
 	
+	public String getValue() {
+		return value;
+	}
+
 	ExchangeTypes(String value) {
 		this.value=value;
 	}
