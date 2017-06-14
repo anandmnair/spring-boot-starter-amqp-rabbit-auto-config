@@ -14,9 +14,6 @@ import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.springframework.amqp.config.DeadLetterConfig;
-import org.springframework.amqp.config.ExchangeConfig;
-import org.springframework.amqp.config.QueueConfig;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.exception.AmqpAutoConfigurationException;
 import org.springframework.boot.test.rule.OutputCapture;
@@ -276,6 +273,34 @@ public class QueueConfigTest {
 		deadLetterConfig=null;
 		
 		Queue queue = queueConfig.buildQueue(globalQueueConfig, deadLetterConfig);
+		assertQueue(queue, expectedQueueConfig);
+	}
+	
+	@Test
+	public void createDeadLetterQueueWithDefaultGlobalConfigurationAppliedTest(){
+		globalQueueConfig=QueueConfig.builder().deadLetterEnabled(true).build();
+		queueConfig=QueueConfig.builder().name(queueName).build();
+		deadLetterConfig=DeadLetterConfig.builder().deadLetterExchange(ExchangeConfig.builder().name("dead-letter-exchange").build())
+				.queuePostfix(".dlq-new")
+				.build();
+		expectedQueueConfig=QueueConfig.builder()
+				.name(queueName+".dlq-new").durable(false).autoDelete(false).exclusive(false).arguments(new HashMap<>())
+				.build();
+		Queue queue = queueConfig.buildDeadLetterQueue(globalQueueConfig, deadLetterConfig);
+		assertQueue(queue, expectedQueueConfig);
+	}
+	
+	@Test
+	public void createDeadLetterQueueWithDefaultGlobalConfigurationPreAppliedTest(){
+		globalQueueConfig=QueueConfig.builder().deadLetterEnabled(true).build();
+		queueConfig=QueueConfig.builder().name(queueName).build().applyGlobalConfig(globalQueueConfig);
+		deadLetterConfig=DeadLetterConfig.builder().deadLetterExchange(ExchangeConfig.builder().name("dead-letter-exchange").build())
+				.queuePostfix(".dlq-new")
+				.build();
+		expectedQueueConfig=QueueConfig.builder()
+				.name(queueName+".dlq-new").durable(false).autoDelete(false).exclusive(false).deadLetterEnabled(true).arguments(new HashMap<>())
+				.build();
+		Queue queue = queueConfig.buildDeadLetterQueue(globalQueueConfig, deadLetterConfig);
 		assertQueue(queue, expectedQueueConfig);
 	}
 	
