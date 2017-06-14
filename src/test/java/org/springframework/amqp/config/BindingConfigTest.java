@@ -11,18 +11,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.springframework.amqp.config.BindingConfig;
-import org.springframework.amqp.config.ExchangeConfig;
-import org.springframework.amqp.config.ExchangeTypes;
-import org.springframework.amqp.config.QueueConfig;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Binding.DestinationType;
-import org.springframework.amqp.exception.AmqpAutoConfigurationException;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.exception.AmqpAutoConfigurationException;
 import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.util.CollectionUtils;
 
@@ -40,12 +35,6 @@ public class BindingConfigTest {
 	
 	@Rule
 	public OutputCapture outputCapture = new OutputCapture();
-	
-	@Before
-	public void setup(){
-		bindingConfig=BindingConfig.builder().build();
-		expectedBindingConfig=BindingConfig.builder().exchange(null).queue(null).routingKey(null).arguments(new HashMap<>()).build();
-	}
 	
 	@Test
 	public void bindingConfigEqualsTest() {
@@ -126,7 +115,8 @@ public class BindingConfigTest {
 		Exchange bindingExchange = ExchangeConfig.builder().name(exchaneg).type(ExchangeTypes.HEADERS).build().buildExchange(ExchangeConfig.builder().build());
 		Queue bindingQueue = QueueConfig.builder().name(queue).build().buildQueue(QueueConfig.builder().build(),null);
 		BindingConfig bindingConfig = BindingConfig.builder().exchange(exchaneg).queue(queue).routingKey(routingKey).argument("key", "value").build();
-		bindingConfig.bind(bindingExchange, bindingQueue);
+		Binding actualBinding = bindingConfig.bind(bindingExchange, bindingQueue);
+		assertBinding(actualBinding, bindingConfig);
 	}
 	
 	@Test(expected=AmqpAutoConfigurationException.class)
@@ -142,7 +132,8 @@ public class BindingConfigTest {
 		Exchange bindingExchange = ExchangeConfig.builder().name(exchaneg).type(ExchangeTypes.DIRECT).build().buildExchange(ExchangeConfig.builder().build());
 		Queue bindingQueue = QueueConfig.builder().name(queue).build().buildQueue(QueueConfig.builder().build(),null);
 		BindingConfig bindingConfig = BindingConfig.builder().exchange(exchaneg).queue(queue).routingKey(routingKey).build();
-		bindingConfig.bind(bindingExchange, bindingQueue);
+		Binding actualBinding = bindingConfig.bind(bindingExchange, bindingQueue);
+		assertBinding(actualBinding, bindingConfig);
 	}
 	
 	@Test(expected=AmqpAutoConfigurationException.class)

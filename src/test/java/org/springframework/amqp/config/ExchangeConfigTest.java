@@ -34,7 +34,7 @@ public class ExchangeConfigTest {
 	public OutputCapture outputCapture = new OutputCapture();
 	
 	@Before
-	public void setup(){
+	public void setUp(){
 		exchangeConfig=ExchangeConfig.builder().build();
 		expectedExchangeConfig=ExchangeConfig.builder().type(ExchangeTypes.TOPIC).durable(false).autoDelete(false).delayed(false).internal(false).build();
 		globalExchangeConfig=ExchangeConfig.builder().build();
