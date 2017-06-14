@@ -8,11 +8,11 @@ public enum ExchangeTypes {
 	
 	private String value;
 	
-	public String getValue() {
-		return value;
-	}
-
 	ExchangeTypes(String value) {
 		this.value=value;
+	}
+	
+	public String getValue() {
+		return value;
 	}
 }
