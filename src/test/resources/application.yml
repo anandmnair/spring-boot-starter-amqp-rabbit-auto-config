@@ -1,0 +1,37 @@
+spring:
+  rabbitmq:
+    config:
+      global-exchange:
+        type: topic
+        durable: false
+        auto-delete: true
+      global-queue:
+        durable: false
+        auto-delete: true
+        dead-letter-enabled: true
+      dead-letter-config:
+        dead-letter-exchange:
+          name: global-dead-letter-exchange.dlx
+          type: topic
+          durable: false
+          auto-delete: true
+        queue-postfix: .dlq
+      exchanges:
+        exchange-one:
+          name: exchange-one
+        exchange-two:
+          name: exchange-two
+      queues:
+        queue-one:
+          name: queue-one
+        queue-two:
+          name: queue-two
+      bindings:
+        binding-one:
+          exchange: exchange-one
+          queue: queue-one
+          routing-key: routing-key-one
+        binding-two:
+          exchange: exchange-two
+          queue: queue-two
+          routing-key: routing-key-two
