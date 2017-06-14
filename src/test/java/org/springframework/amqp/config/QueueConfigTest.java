@@ -38,7 +38,7 @@ public class QueueConfigTest {
 	public OutputCapture outputCapture = new OutputCapture();
 	
 	@Before
-	public void setup(){
+	public void setUp(){
 		queueConfig=QueueConfig.builder().build();
 		expectedQueueConfig=QueueConfig.builder().durable(false).autoDelete(false).exclusive(false).deadLetterEnabled(false).build();
 		globalQueueConfig=QueueConfig.builder().build();

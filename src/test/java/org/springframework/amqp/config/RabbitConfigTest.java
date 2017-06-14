@@ -178,7 +178,6 @@ public class RabbitConfigTest {
 				.binding(binding, BindingConfig.builder().exchange(exchange).queue(queue).routingKey(routingKey).build())
 				.build();
 		rabbitConfig.validate();
-		//assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done succussfully")));
 	}
 	
 	@Test(expected=AmqpAutoConfigurationException.class)
@@ -192,7 +191,6 @@ public class RabbitConfigTest {
 				.binding(binding, BindingConfig.builder().exchange(exchange).queue(queue).routingKey(routingKey).build())
 				.build();
 		rabbitConfig.validate();
-		//assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done succussfully")));
 	}
 	
 	@Test(expected=AmqpAutoConfigurationException.class)
@@ -206,7 +204,6 @@ public class RabbitConfigTest {
 				.binding(binding, BindingConfig.builder().exchange(exchange).queue(queue).routingKey(routingKey).build())
 				.build();
 		rabbitConfig.validate();
-		//assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done succussfully")));
 	}
 	
 	@Test
