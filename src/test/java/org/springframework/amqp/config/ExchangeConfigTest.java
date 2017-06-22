@@ -14,8 +14,6 @@ import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.springframework.amqp.config.ExchangeConfig;
-import org.springframework.amqp.config.ExchangeTypes;
 import org.springframework.amqp.core.AbstractExchange;
 import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.util.CollectionUtils;
@@ -36,14 +34,12 @@ public class ExchangeConfigTest {
 	@Before
 	public void setUp(){
 		exchangeConfig=ExchangeConfig.builder().build();
-		expectedExchangeConfig=ExchangeConfig.builder().type(ExchangeTypes.TOPIC).durable(false).autoDelete(false).delayed(false).internal(false).build();
+		expectedExchangeConfig=ExchangeConfig.builder().build();
 		globalExchangeConfig=ExchangeConfig.builder().build();
 	}
 	
 	@Test
 	public void exchangeConfigEqualsTest() {
-		exchangeConfig=ExchangeConfig.builder().build();
-		expectedExchangeConfig=ExchangeConfig.builder().build();
 		assertTrue(exchangeConfig.equals(expectedExchangeConfig));
 		exchangeConfig.setGlobalConfigApplied(false);
 		expectedExchangeConfig.setGlobalConfigApplied(true);
@@ -52,8 +48,6 @@ public class ExchangeConfigTest {
 	
 	@Test
 	public void exchangeConfigeHashcodeTest() {
-		exchangeConfig=ExchangeConfig.builder().build();
-		expectedExchangeConfig=ExchangeConfig.builder().build();
 		assertThat(exchangeConfig.hashCode(),equalTo(expectedExchangeConfig.hashCode()));
 		exchangeConfig.setGlobalConfigApplied(false);
 		expectedExchangeConfig.setGlobalConfigApplied(true);
@@ -195,13 +189,13 @@ public class ExchangeConfigTest {
 		
 		exchangeConfig=ExchangeConfig.builder()
 				.name(exchangeName).type(ExchangeTypes.FANOUT).durable(false).autoDelete(false)
-				.argument("key1", "NEW_VALUE").argument("key2", "value2")
+				.argument("key2", "value2").argument("key1", "NEW_VALUE")
 				.build()
 				.applyGlobalConfig(globalExchangeConfig);
 		
 		expectedExchangeConfig=ExchangeConfig.builder()
 				.name(exchangeName).type(ExchangeTypes.FANOUT).durable(false).autoDelete(false).delayed(true).internal(true)
-				.argument("key1", "NEW_VALUE").argument("key2", "value2")
+				.argument("key2", "value2").argument("key1", "NEW_VALUE")
 				.build();
 		
 		AbstractExchange exchange = exchangeConfig.buildExchange(globalExchangeConfig);
