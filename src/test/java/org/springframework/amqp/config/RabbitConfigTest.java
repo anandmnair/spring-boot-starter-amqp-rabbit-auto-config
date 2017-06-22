@@ -63,26 +63,30 @@ public class RabbitConfigTest {
 	@Test
 	public void rabbitConfigWithValidExchangeAndQueueAndBindingTest() {
 		rabbitConfig=RabbitConfig.builder()
-				.globalExchange(ExchangeConfig.builder().type(ExchangeTypes.TOPIC).autoDelete(true).durable(false).build())
-				.globalQueue(QueueConfig.builder().autoDelete(true).durable(false).deadLetterEnabled(true).build())
-				.deadLetterConfig(DeadLetterConfig.builder().deadLetterExchange(ExchangeConfig.builder().name("dead-letter-exchange.dlx").build()).build())
-				.exchange(exchange, ExchangeConfig.builder().name(exchange).type(ExchangeTypes.TOPIC).build())
-				.queue(queue, QueueConfig.builder().name(queue).build())
-				.binding(binding, BindingConfig.builder().exchange(exchange).queue(queue).routingKey(routingKey).build())
+				.globalExchange(createGlobalExchangeConfig())
+				.globalQueue(createGlobalQueueConfig())
+				.deadLetterConfig(createValidDeadLetterConfig())
+				.exchange(exchange, createExchangeConfig(exchange))
+				.queue(queue, createQueueConfig(queue))
+				.binding(binding, createBinding(exchange,queue,routingKey))
 				.build();
 		rabbitConfig.validate();
 		assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done succussfully")));
 	}
-	
+
+	private BindingConfig createBinding(String exchange, String queue, String routingKey) {
+		return BindingConfig.builder().exchange(exchange).queue(queue).routingKey(routingKey).build();
+	}
+
 	@Test(expected=AmqpAutoConfigurationException.class)
 	public void rabbitConfigWithInvalidExchangeAndValidQueueAndValidBindingTest() {
 		rabbitConfig=RabbitConfig.builder()
-				.globalExchange(ExchangeConfig.builder().type(ExchangeTypes.TOPIC).autoDelete(true).durable(false).build())
-				.globalQueue(QueueConfig.builder().autoDelete(true).durable(false).deadLetterEnabled(true).build())
-				.deadLetterConfig(DeadLetterConfig.builder().deadLetterExchange(ExchangeConfig.builder().name("dead-letter-exchange.dlx").build()).build())
-				.exchange(exchange, ExchangeConfig.builder().type(ExchangeTypes.TOPIC).build())
-				.queue(queue, QueueConfig.builder().name(queue).build())
-				.binding(binding, BindingConfig.builder().exchange(exchange).queue(queue).routingKey(routingKey).build())
+				.globalExchange(createGlobalExchangeConfig())
+				.globalQueue(createGlobalQueueConfig())
+				.deadLetterConfig(createValidDeadLetterConfig())
+				.exchange(exchange, createExchangeConfig(null))
+				.queue(queue, createQueueConfig(queue))
+				.binding(binding, createBinding(exchange,queue,routingKey))
 				.build();
 		rabbitConfig.validate();
 	}
@@ -90,12 +94,12 @@ public class RabbitConfigTest {
 	@Test(expected=AmqpAutoConfigurationException.class)
 	public void rabbitConfigWithValidExchangeAndInvalidQueueAndValidBindingTest() {
 		rabbitConfig=RabbitConfig.builder()
-				.globalExchange(ExchangeConfig.builder().type(ExchangeTypes.TOPIC).autoDelete(true).durable(false).build())
-				.globalQueue(QueueConfig.builder().autoDelete(true).durable(false).deadLetterEnabled(true).build())
-				.deadLetterConfig(DeadLetterConfig.builder().deadLetterExchange(ExchangeConfig.builder().name("dead-letter-exchange.dlx").build()).build())
-				.exchange(exchange, ExchangeConfig.builder().name(exchange).type(ExchangeTypes.TOPIC).build())
-				.queue(queue, QueueConfig.builder().build())
-				.binding(binding, BindingConfig.builder().exchange(exchange).queue(queue).routingKey(routingKey).build())
+				.globalExchange(createGlobalExchangeConfig())
+				.globalQueue(createGlobalQueueConfig())
+				.deadLetterConfig(createValidDeadLetterConfig())
+				.exchange(exchange, createExchangeConfig(exchange))
+				.queue(queue, createQueueConfig(null))
+				.binding(binding, createBinding(exchange,queue,routingKey))
 				.build();
 		rabbitConfig.validate();
 	}
@@ -103,25 +107,25 @@ public class RabbitConfigTest {
 	@Test(expected=AmqpAutoConfigurationException.class)
 	public void rabbitConfigWithValidExchangeAndValidQueueAndInvalidBindingTest() {
 		rabbitConfig=RabbitConfig.builder()
-				.globalExchange(ExchangeConfig.builder().type(ExchangeTypes.TOPIC).autoDelete(true).durable(false).build())
-				.globalQueue(QueueConfig.builder().autoDelete(true).durable(false).deadLetterEnabled(true).build())
-				.deadLetterConfig(DeadLetterConfig.builder().deadLetterExchange(ExchangeConfig.builder().name("dead-letter-exchange.dlx").build()).build())
-				.exchange(exchange, ExchangeConfig.builder().name(exchange).type(ExchangeTypes.TOPIC).build())
-				.queue(queue, QueueConfig.builder().name(exchange).build())
+				.globalExchange(createGlobalExchangeConfig())
+				.globalQueue(createGlobalQueueConfig())
+				.deadLetterConfig(createValidDeadLetterConfig())
+				.exchange(exchange, createExchangeConfig(exchange))
+				.queue(queue, createQueueConfig(queue))
 				.binding(binding, BindingConfig.builder().queue(queue).routingKey(routingKey).build())
 				.build();
 		rabbitConfig.validate();
 	}
-	
+
 	@Test(expected=AmqpAutoConfigurationException.class)
 	public void rabbitConfigWithDeadLetterEnabledAndNullDeadLetterConfigTest() {
 		rabbitConfig=RabbitConfig.builder()
-				.globalExchange(ExchangeConfig.builder().type(ExchangeTypes.TOPIC).autoDelete(true).durable(false).build())
-				.globalQueue(QueueConfig.builder().autoDelete(true).durable(false).deadLetterEnabled(true).build())
+				.globalExchange(createGlobalExchangeConfig())
+				.globalQueue(createGlobalQueueConfig())
 				.deadLetterConfig(null)
-				.exchange(exchange, ExchangeConfig.builder().name(exchange).type(ExchangeTypes.TOPIC).build())
-				.queue(queue, QueueConfig.builder().name(exchange).build())
-				.binding(binding, BindingConfig.builder().exchange(exchange).queue(queue).routingKey(routingKey).build())
+				.exchange(exchange, createExchangeConfig(exchange))
+				.queue(queue, createQueueConfig(queue))
+				.binding(binding, createBinding(exchange,queue,routingKey))
 				.build();
 		rabbitConfig.validate();
 	}
@@ -129,12 +133,12 @@ public class RabbitConfigTest {
 	@Test(expected=AmqpAutoConfigurationException.class)
 	public void rabbitConfigWithDeadLetterEnabledAndNullDeadLetterExchangeTest() {
 		rabbitConfig=RabbitConfig.builder()
-				.globalExchange(ExchangeConfig.builder().type(ExchangeTypes.TOPIC).autoDelete(true).durable(false).build())
-				.globalQueue(QueueConfig.builder().autoDelete(true).durable(false).deadLetterEnabled(true).build())
+				.globalExchange(createGlobalExchangeConfig())
+				.globalQueue(createGlobalQueueConfig())
 				.deadLetterConfig(DeadLetterConfig.builder().deadLetterExchange(null).build())
-				.exchange(exchange, ExchangeConfig.builder().name(exchange).type(ExchangeTypes.TOPIC).build())
-				.queue(queue, QueueConfig.builder().name(exchange).build())
-				.binding(binding, BindingConfig.builder().exchange(exchange).queue(queue).routingKey(routingKey).build())
+				.exchange(exchange, createExchangeConfig(exchange))
+				.queue(queue, createQueueConfig(queue))
+				.binding(binding, createBinding(exchange,queue,routingKey))
 				.build();
 		rabbitConfig.validate();
 	}
@@ -142,12 +146,12 @@ public class RabbitConfigTest {
 	@Test
 	public void rabbitConfigWithNoDeadLetterEnabledAndNullDeadLetterConfigTest() {
 		rabbitConfig=RabbitConfig.builder()
-				.globalExchange(ExchangeConfig.builder().type(ExchangeTypes.TOPIC).autoDelete(true).durable(false).build())
+				.globalExchange(createGlobalExchangeConfig())
 				.globalQueue(QueueConfig.builder().autoDelete(true).durable(false).deadLetterEnabled(false).build())
 				.deadLetterConfig(null)
-				.exchange(exchange, ExchangeConfig.builder().name(exchange).type(ExchangeTypes.TOPIC).build())
+				.exchange(exchange, createExchangeConfig(exchange))
 				.queue(queue, QueueConfig.builder().name(queue).deadLetterEnabled(false).build())
-				.binding(binding, BindingConfig.builder().exchange(exchange).queue(queue).routingKey(routingKey).build())
+				.binding(binding, createBinding(exchange,queue,routingKey))
 				.build();
 		rabbitConfig.validate();
 		assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done succussfully")));
@@ -156,12 +160,12 @@ public class RabbitConfigTest {
 	@Test
 	public void rabbitConfigWithNoDeadLetterEnabledAndNullDeadLetterExchangeTest() {
 		rabbitConfig=RabbitConfig.builder()
-				.globalExchange(ExchangeConfig.builder().type(ExchangeTypes.TOPIC).autoDelete(true).durable(false).build())
+				.globalExchange(createGlobalExchangeConfig())
 				.globalQueue(QueueConfig.builder().deadLetterEnabled(false).build())
 				.deadLetterConfig(DeadLetterConfig.builder().deadLetterExchange(null).build())
-				.exchange(exchange, ExchangeConfig.builder().name(exchange).type(ExchangeTypes.TOPIC).build())
-				.queue(queue, QueueConfig.builder().name(exchange).build().applyGlobalConfig(QueueConfig.builder().deadLetterEnabled(false).build()))
-				.binding(binding, BindingConfig.builder().exchange(exchange).queue(queue).routingKey(routingKey).build())
+				.exchange(exchange, createExchangeConfig(exchange))
+				.queue(queue, QueueConfig.builder().name(queue).build().applyGlobalConfig(QueueConfig.builder().deadLetterEnabled(false).build()))
+				.binding(binding, createBinding(exchange,queue,routingKey))
 				.build();
 		rabbitConfig.validate();
 		assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done succussfully")));
@@ -170,12 +174,12 @@ public class RabbitConfigTest {
 	@Test(expected=AmqpAutoConfigurationException.class)
 	public void rabbitConfigWithDeadLetterEnabledForQueueAndNullDeadLetterExchangeTest() {
 		rabbitConfig=RabbitConfig.builder()
-				.globalExchange(ExchangeConfig.builder().type(ExchangeTypes.TOPIC).autoDelete(true).durable(false).build())
+				.globalExchange(createGlobalExchangeConfig())
 				.globalQueue(null)
 				.deadLetterConfig(DeadLetterConfig.builder().deadLetterExchange(null).build())
-				.exchange(exchange, ExchangeConfig.builder().name(exchange).type(ExchangeTypes.TOPIC).build())
+				.exchange(exchange, createExchangeConfig(exchange))
 				.queue(queue, QueueConfig.builder().name(exchange).deadLetterEnabled(true).build())
-				.binding(binding, BindingConfig.builder().exchange(exchange).queue(queue).routingKey(routingKey).build())
+				.binding(binding, createBinding(exchange,queue,routingKey))
 				.build();
 		rabbitConfig.validate();
 	}
@@ -183,12 +187,12 @@ public class RabbitConfigTest {
 	@Test(expected=AmqpAutoConfigurationException.class)
 	public void rabbitConfigWithDeadLetterEnabledForQueueAndNullGlobalDeadLetterExchangeTest() {
 		rabbitConfig=RabbitConfig.builder()
-				.globalExchange(ExchangeConfig.builder().type(ExchangeTypes.TOPIC).autoDelete(true).durable(false).build())
+				.globalExchange(createGlobalExchangeConfig())
 				.globalQueue(QueueConfig.builder().deadLetterEnabled(null).build())
 				.deadLetterConfig(DeadLetterConfig.builder().deadLetterExchange(null).build())
-				.exchange(exchange, ExchangeConfig.builder().name(exchange).type(ExchangeTypes.TOPIC).build())
+				.exchange(exchange, createExchangeConfig(exchange))
 				.queue(queue, QueueConfig.builder().name(exchange).deadLetterEnabled(true).build())
-				.binding(binding, BindingConfig.builder().exchange(exchange).queue(queue).routingKey(routingKey).build())
+				.binding(binding, createBinding(exchange,queue,routingKey))
 				.build();
 		rabbitConfig.validate();
 	}
@@ -196,12 +200,12 @@ public class RabbitConfigTest {
 	@Test(expected=AmqpAutoConfigurationException.class)
 	public void rabbitConfigWithDeadLetterEnabledForQueueAndGlobalDeadLetterExchangeTest() {
 		rabbitConfig=RabbitConfig.builder()
-				.globalExchange(ExchangeConfig.builder().type(ExchangeTypes.TOPIC).autoDelete(true).durable(false).build())
+				.globalExchange(createGlobalExchangeConfig())
 				.globalQueue(QueueConfig.builder().deadLetterEnabled(false).build())
 				.deadLetterConfig(DeadLetterConfig.builder().deadLetterExchange(null).build())
-				.exchange(exchange, ExchangeConfig.builder().name(exchange).type(ExchangeTypes.TOPIC).build())
+				.exchange(exchange, createExchangeConfig(exchange))
 				.queue(queue, QueueConfig.builder().name(exchange).deadLetterEnabled(true).build())
-				.binding(binding, BindingConfig.builder().exchange(exchange).queue(queue).routingKey(routingKey).build())
+				.binding(binding, createBinding(exchange,queue,routingKey))
 				.build();
 		rabbitConfig.validate();
 	}
@@ -209,12 +213,12 @@ public class RabbitConfigTest {
 	@Test
 	public void rabbitConfigWithNoDeadLetterEnabledForQueueAndNoGlobalDeadLetterExchangeTest() {
 		rabbitConfig=RabbitConfig.builder()
-				.globalExchange(ExchangeConfig.builder().type(ExchangeTypes.TOPIC).autoDelete(true).durable(false).build())
+				.globalExchange(createGlobalExchangeConfig())
 				.globalQueue(null)
 				.deadLetterConfig(DeadLetterConfig.builder().deadLetterExchange(null).build())
-				.exchange(exchange, ExchangeConfig.builder().name(exchange).type(ExchangeTypes.TOPIC).build())
+				.exchange(exchange, createExchangeConfig(exchange))
 				.queue(queue, QueueConfig.builder().name(exchange).deadLetterEnabled(false).build())
-				.binding(binding, BindingConfig.builder().exchange(exchange).queue(queue).routingKey(routingKey).build())
+				.binding(binding, createBinding(exchange,queue,routingKey))
 				.build();
 		rabbitConfig.validate();
 		assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done succussfully")));
@@ -224,12 +228,12 @@ public class RabbitConfigTest {
 	@Test
 	public void rabbitConfigWithNullDeadLetterEnabledForQueueAndNoGlobalDeadLetterExchangeTest() {
 		rabbitConfig=RabbitConfig.builder()
-				.globalExchange(ExchangeConfig.builder().type(ExchangeTypes.TOPIC).autoDelete(true).durable(false).build())
+				.globalExchange(createGlobalExchangeConfig())
 				.globalQueue(null)
 				.deadLetterConfig(DeadLetterConfig.builder().deadLetterExchange(null).build())
-				.exchange(exchange, ExchangeConfig.builder().name(exchange).type(ExchangeTypes.TOPIC).build())
+				.exchange(exchange, createExchangeConfig(exchange))
 				.queue(queue, QueueConfig.builder().name(queue).deadLetterEnabled(null).build())
-				.binding(binding, BindingConfig.builder().exchange(exchange).queue(queue).routingKey(routingKey).build())
+				.binding(binding, createBinding(exchange,queue,routingKey))
 				.build();
 		rabbitConfig.validate();
 		assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done succussfully")));
@@ -238,12 +242,12 @@ public class RabbitConfigTest {
 	@Test(expected=AmqpAutoConfigurationException.class)
 	public void rabbitConfigWithDeadLetterEnabledForQueueAndNoGlobalDeadLetterExchangeTest() {
 		rabbitConfig=RabbitConfig.builder()
-				.globalExchange(ExchangeConfig.builder().type(ExchangeTypes.TOPIC).autoDelete(true).durable(false).build())
+				.globalExchange(createGlobalExchangeConfig())
 				.globalQueue(null)
 				.deadLetterConfig(DeadLetterConfig.builder().deadLetterExchange(null).build())
-				.exchange(exchange, ExchangeConfig.builder().name(exchange).type(ExchangeTypes.TOPIC).build())
+				.exchange(exchange, createExchangeConfig(exchange))
 				.queue(queue, QueueConfig.builder().name(exchange).deadLetterEnabled(true).build())
-				.binding(binding, BindingConfig.builder().exchange(exchange).queue(queue).routingKey(routingKey).build())
+				.binding(binding, createBinding(exchange,queue,routingKey))
 				.build();
 		rabbitConfig.validate();
 	}
@@ -262,4 +266,26 @@ public class RabbitConfigTest {
 		rabbitConfig.validate();
 		assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done succussfully")));
 	}
+	
+	private ExchangeConfig createGlobalExchangeConfig() {
+		return createExchangeConfig(null);
+	}
+	
+	private ExchangeConfig createExchangeConfig(String name) {
+		return ExchangeConfig.builder().name(name).type(ExchangeTypes.TOPIC).autoDelete(true).durable(false).build();
+	}
+	
+	private QueueConfig createGlobalQueueConfig() {
+		return createQueueConfig(null);
+	}
+	
+	private QueueConfig createQueueConfig(String name) {
+		return QueueConfig.builder().name(name).autoDelete(true).durable(false).deadLetterEnabled(true).build();
+	}
+
+	private DeadLetterConfig createValidDeadLetterConfig() {
+		return DeadLetterConfig.builder().deadLetterExchange(ExchangeConfig.builder().name("dead-letter-exchange.dlx").build()).build();
+	}
+	
+	
 }

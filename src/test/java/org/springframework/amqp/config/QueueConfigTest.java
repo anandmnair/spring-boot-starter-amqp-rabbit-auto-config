@@ -192,13 +192,13 @@ public class QueueConfigTest {
 		
 		queueConfig=QueueConfig.builder()
 				.name(queueName).durable(false).autoDelete(false)
-				.argument("key1", "NEW_VALUE").argument("key2", "value2")
+				.argument("key2", "value2").argument("key1", "NEW_VALUE")
 				.build()
 				.applyGlobalConfig(globalQueueConfig);
 		
 		expectedQueueConfig=QueueConfig.builder()
 				.name(queueName).durable(false).autoDelete(false).exclusive(true).deadLetterEnabled(true)
-				.argument("key1", "NEW_VALUE").argument("key2", "value2")
+				.argument("key2", "value2").argument("key1", "NEW_VALUE")
 				.build();
 		
 		Queue queue = queueConfig.buildQueue(globalQueueConfig, null);
