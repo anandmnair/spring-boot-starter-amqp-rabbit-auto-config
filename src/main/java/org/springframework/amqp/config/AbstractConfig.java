@@ -35,9 +35,6 @@ public abstract class AbstractConfig {
 		if(currentArguments!=null) {
 			arguments.putAll(currentArguments);
 		}
-		//if(currentArguments!=null && globalArguments!=null) {
-		//	globalArguments.entrySet().forEach(e-> currentArguments.putIfAbsent(e.getKey(), e.getValue()));
-		//}
 		return arguments;
 	}
 	

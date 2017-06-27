@@ -29,6 +29,8 @@ public class SpringBootStarterAmqpRabbitAutoConfigApplicationTests {
 		assertTrue(applicationContext.containsBean("global-dead-letter-exchange.dlx"));
 		assertTrue(applicationContext.containsBean("queue-one.dlq"));
 		assertTrue(applicationContext.containsBean("queue-two.dlq"));
+		assertTrue(applicationContext.containsBean("global-dead-letter-exchange.dlx:queue-one.dlq"));
+		assertTrue(applicationContext.containsBean("global-dead-letter-exchange.dlx:queue-two.dlq"));
 	}
 	
 }

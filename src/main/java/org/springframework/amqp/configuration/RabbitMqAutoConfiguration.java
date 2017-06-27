@@ -7,6 +7,7 @@ import org.springframework.amqp.config.ExchangeConfig;
 import org.springframework.amqp.config.QueueConfig;
 import org.springframework.amqp.config.RabbitConfig;
 import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
@@ -16,11 +17,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.util.CollectionUtils;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Configuration
+@Import(RabbitConfig.class)
 @EnableRabbit
 @Slf4j
 public class RabbitMqAutoConfiguration implements ApplicationContextAware {
@@ -39,9 +41,9 @@ public class RabbitMqAutoConfiguration implements ApplicationContextAware {
 	}
 
 	public void loadRabbitConfig() {
-		
+		Exchange deadLetterExchange = null;
 		if(rabbitConfig.getDeadLetterConfig()!=null && rabbitConfig.getDeadLetterConfig().getDeadLetterExchange()!=null) {
-			Exchange deadLetterExchange = rabbitConfig.getDeadLetterConfig().getDeadLetterExchange().buildExchange(rabbitConfig.getGlobalExchange());
+			deadLetterExchange = rabbitConfig.getDeadLetterConfig().getDeadLetterExchange().buildExchange(rabbitConfig.getGlobalExchange());
 			applicationContext.getBeanFactory().registerSingleton(deadLetterExchange.getName(), deadLetterExchange);
 			log.info("Auto configuring dead letter exchange: Key = {} , DeadLetterExchange = {{}}", deadLetterExchange.getName(), deadLetterExchange);
 		}
@@ -65,6 +67,10 @@ public class RabbitMqAutoConfiguration implements ApplicationContextAware {
 					Queue deadLetterQueue = entry.getValue().buildDeadLetterQueue(rabbitConfig.getGlobalQueue(), rabbitConfig.getDeadLetterConfig());
 					applicationContext.getBeanFactory().registerSingleton(deadLetterQueue.getName(), deadLetterQueue);
 					log.info("Auto configuring dead letter queue: Key = {} , DeadLetterQueue = {{}}", deadLetterQueue.getName(), deadLetterQueue);
+					Binding deadLetterBinding = BindingBuilder.bind(deadLetterQueue).to(deadLetterExchange).with(deadLetterQueue.getName()).noargs();
+					String deadLetterBindingKey = new StringBuilder().append(deadLetterExchange.getName()).append(":").append(deadLetterQueue.getName()).toString();
+					applicationContext.getBeanFactory().registerSingleton(deadLetterBindingKey, deadLetterBinding);
+					log.info("Auto configuring dead letter binding: Key = {} , DeadLetterBinding = {{}}", deadLetterBindingKey, deadLetterBinding);
 				}
 			}
 		}
