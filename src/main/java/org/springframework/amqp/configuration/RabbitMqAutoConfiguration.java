@@ -13,18 +13,21 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.util.CollectionUtils;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Configuration
-@Import(RabbitConfig.class)
+@Import(RabbitMqConfiguration.class)
 @EnableRabbit
 @Slf4j
+@ConditionalOnBean(RabbitConfig.class)
 public class RabbitMqAutoConfiguration implements ApplicationContextAware {
 
 	private ConfigurableApplicationContext applicationContext;

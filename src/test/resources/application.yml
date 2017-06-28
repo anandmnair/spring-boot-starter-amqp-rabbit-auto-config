@@ -1,7 +1,8 @@
 spring:
   rabbitmq:
-    config:
-      global-exchange:
+    auto-config: 
+      enabled: false 
+      global-exchange: 
         type: topic
         durable: false
         auto-delete: true

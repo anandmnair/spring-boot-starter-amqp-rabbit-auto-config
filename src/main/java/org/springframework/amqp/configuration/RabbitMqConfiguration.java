@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMqConfiguration {
 
 	@Bean
-	@ConditionalOnProperty(name="spring.rabbitmq.config")
+	@ConditionalOnProperty(prefix="spring.rabbitmq.auto-config", name="enabled", matchIfMissing=true)
 	public RabbitConfig rabbitConfig(){
 		return new RabbitConfig();
 	}

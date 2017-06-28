@@ -1,5 +1,6 @@
 package org.springframework.amqp.config;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -20,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @Data
 @Slf4j
-@ConfigurationProperties(prefix = "spring.rabbitmq.config")
+@ConfigurationProperties(prefix = "spring.rabbitmq.auto-config")
 public class RabbitConfig {
 
 	private ExchangeConfig globalExchange;
@@ -28,15 +29,17 @@ public class RabbitConfig {
 	private QueueConfig globalQueue;
 
 	private DeadLetterConfig deadLetterConfig;
+	
+	private boolean enabled=true; 
 
 	@Singular
-	private Map<String, ExchangeConfig> exchanges;
+	private Map<String, ExchangeConfig> exchanges = new LinkedHashMap<>();
 
 	@Singular
-	private Map<String, QueueConfig> queues;
+	private Map<String, QueueConfig> queues = new LinkedHashMap<>();;
 
 	@Singular
-	private Map<String, BindingConfig> bindings;
+	private Map<String, BindingConfig> bindings =  new LinkedHashMap<>();;
 
 	@PostConstruct
 	public void validate() {
@@ -88,10 +91,6 @@ public class RabbitConfig {
 			}
 			return false;
 		}
-//		return (globalQueue!=null && 
-//				globalQueue.getDeadLetterEnabled()!=null && 
-//				globalQueue.getDeadLetterEnabled()) || 
-//				(queues.values().stream().anyMatch(QueueConfig::getDeadLetterEnabled));
 	}
 
 	
