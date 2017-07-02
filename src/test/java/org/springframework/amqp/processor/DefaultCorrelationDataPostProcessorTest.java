@@ -42,6 +42,16 @@ public class DefaultCorrelationDataPostProcessorTest {
     }
 
     @Test
+    public void postProcessWithNoCorrelationDataIdTest() {
+        CorrelationData correlationData = defaultCorrelationDataPostProcessor.postProcess(message, new CorrelationData(null));
+        assertNotNull(message.getMessageProperties().getHeaders().get("correlation-id"));
+        assertNotNull(correlationData);
+        assertNotNull(correlationData.getId());
+        assertThat(message.getMessageProperties().getHeaders().get("correlation-id"),
+                is(correlationData.getId()));
+    }
+
+    @Test
     public void postProcessWithCorrelationDataTest() {
         CorrelationData inputCorrelationData = new CorrelationData("my-correlation-id");
         CorrelationData correlationData = defaultCorrelationDataPostProcessor.postProcess(message, inputCorrelationData);
