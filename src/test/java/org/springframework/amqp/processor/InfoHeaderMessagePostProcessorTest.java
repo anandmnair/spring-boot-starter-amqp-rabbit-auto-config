@@ -32,6 +32,7 @@ public class InfoHeaderMessagePostProcessorTest {
     @Before
     public void setUp() {
         infoHeaderMessagePostProcessor.getHeaders().put("info-key", "info-value");
+        infoHeaderMessagePostProcessor.setEnvironment(environment);
         message=MessageBuilder.withBody("DummyMessage".getBytes()).build();
     }
 

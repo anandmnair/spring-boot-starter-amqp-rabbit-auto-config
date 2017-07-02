@@ -28,7 +28,7 @@ public class InfoHeaderMessagePostProcessor implements MessagePostProcessor {
 			message.getMessageProperties().getHeaders().putIfAbsent(entry.getKey(), entry.getValue());
 		}
 		messageProperties.getHeaders().putIfAbsent("spring-application-name",
-				environment.getProperty("spring.application.name", String.class));
+				getEnvironment().getProperty("spring.application.name", String.class));
 		return message;
 	}
 
