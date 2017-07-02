@@ -1,20 +1,14 @@
 package org.springframework.amqp.config;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.annotation.PostConstruct;
-
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.exception.AmqpAutoConfigurationException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Singular;
-import lombok.extern.slf4j.Slf4j;
+import javax.annotation.PostConstruct;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 @Builder
 @NoArgsConstructor
@@ -30,16 +24,19 @@ public class RabbitConfig {
 
 	private DeadLetterConfig deadLetterConfig;
 	
-	private boolean enabled=true; 
+	private boolean enabled=true;
+
+	@Singular
+	private Map<String, String> infoHeaders = new LinkedHashMap<>();
 
 	@Singular
 	private Map<String, ExchangeConfig> exchanges = new LinkedHashMap<>();
 
 	@Singular
-	private Map<String, QueueConfig> queues = new LinkedHashMap<>();;
+	private Map<String, QueueConfig> queues = new LinkedHashMap<>();
 
 	@Singular
-	private Map<String, BindingConfig> bindings =  new LinkedHashMap<>();;
+	private Map<String, BindingConfig> bindings =  new LinkedHashMap<>();
 
 	@PostConstruct
 	public void validate() {

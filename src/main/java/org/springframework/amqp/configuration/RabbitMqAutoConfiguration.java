@@ -6,19 +6,29 @@ import org.springframework.amqp.config.BindingConfig;
 import org.springframework.amqp.config.ExchangeConfig;
 import org.springframework.amqp.config.QueueConfig;
 import org.springframework.amqp.config.RabbitConfig;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Exchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.processor.CorrelationPostProcessor;
+import org.springframework.amqp.processor.DefaultCorrelationDataPostProcessor;
+import org.springframework.amqp.processor.InfoHeaderMessagePostProcessor;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
+import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.CorrelationDataPostProcessor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.retry.RepublishMessageRecoverer;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 import org.springframework.util.CollectionUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +44,48 @@ public class RabbitMqAutoConfiguration implements ApplicationContextAware {
 	
 	@Autowired
 	private RabbitConfig rabbitConfig;
+
+	@Bean
+	@ConditionalOnMissingBean(MessageConverter.class)
+	public MessageConverter messageConverter() {
+		return new Jackson2JsonMessageConverter();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean(RetryOperationsInterceptor.class)
+	public RetryOperationsInterceptor interceptor(AmqpTemplate amqpTemplate) {
+		return RetryInterceptorBuilder.stateless()
+				.maxAttempts(5)
+				.recoverer(new RepublishMessageRecoverer(amqpTemplate, "${rabbitmq.auto-config.exchange.global-err-exchange.name}"))
+				.build();
+	}
+
+	@Bean
+	public AmqpTemplate amqpTemplate(ConnectionFactory connectionFactory, CorrelationDataPostProcessor correlationDataPostProcessor, MessagePostProcessor...messagePostProcessors) {
+		RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+		rabbitTemplate.setBeforePublishPostProcessors(messagePostProcessors);
+		rabbitTemplate.setCorrelationDataPostProcessor(correlationDataPostProcessor);
+		return rabbitTemplate;
+	}
+
+	@Bean
+	public MessagePostProcessor headerMessagePostProcessor() {
+		InfoHeaderMessagePostProcessor infoHeaderMessagePostProcessor = new InfoHeaderMessagePostProcessor();
+		infoHeaderMessagePostProcessor.setHeaders(rabbitConfig.getInfoHeaders());
+		return infoHeaderMessagePostProcessor;
+	}
+
+	@Bean
+	@ConditionalOnMissingBean(CorrelationDataPostProcessor.class)
+	public CorrelationDataPostProcessor correlationDataPostProcessor(CorrelationPostProcessor correlationPostProcessor) {
+		return new DefaultCorrelationDataPostProcessor(correlationPostProcessor);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean(CorrelationPostProcessor.class)
+	public CorrelationPostProcessor correlationPostProcessor() {
+		return new CorrelationPostProcessor();
+	}
 	
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
