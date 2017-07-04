@@ -29,21 +29,9 @@ public class ReQueueConfig extends AbstractConfig {
 
         boolean valid=true;
 
-        if(getExchange()==null) {
-            log.error("Invalid Exchange : Exchange must be provided for a requeue configuration");
-            valid=false;
-        }
-        else {
-            valid=getExchange().validate()?valid:false;
-        }
+        valid=validate("exchange", exchange, valid);
 
-        if(getQueue()==null) {
-            log.error("Invalid Queue : Queue must be provided for a requeue configuration");
-            valid=false;
-        }
-        else {
-            valid=getQueue().validate()?valid:false;
-        }
+        valid=validate("queue", queue, valid);
 
         if(autoRequeueEnabled && StringUtils.isEmpty(cron)) {
             log.error("Invalid Cron : Cron must be provided for auto requeue configuration");
@@ -54,6 +42,17 @@ public class ReQueueConfig extends AbstractConfig {
             log.info("Requeue configuration validated successfully : '{}'", this);
         }
 
+        return valid;
+    }
+
+    private boolean validate(String key, AbstractConfig abstractConfig, boolean valid) {
+        if(abstractConfig==null) {
+            log.error("Invalid {} : {} must be provided for a requeue configuration", key, key);
+            valid=false;
+        }
+        else {
+            valid=getExchange().validate()?valid:false;
+        }
         return valid;
     }
 }
