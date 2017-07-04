@@ -1,9 +1,11 @@
 package org.springframework.amqp.config;
 
-import org.springframework.util.StringUtils;
-
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 /**
  * Created by anand on 04/07/17.
@@ -12,9 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@EqualsAndHashCode(callSuper = false)
 @Slf4j
-public class ReQueueConfig extends AbstractConfig {
+public class ReQueueConfig {
 
     private boolean enabled;
 
@@ -26,7 +27,6 @@ public class ReQueueConfig extends AbstractConfig {
 
     private boolean autoRequeueEnabled;
 
-    @Override
     public boolean validate() {
 
         boolean valid=true;

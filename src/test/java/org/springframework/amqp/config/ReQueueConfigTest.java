@@ -17,6 +17,7 @@ public class ReQueueConfigTest {
 
     @Before
     public void setUp() {
+    	reQueueConfig = new ReQueueConfig();
     	exchangeConfig=ExchangeConfig.builder().name("requeue-exchange").build();
     	queueConfig=QueueConfig.builder().name("requeue").build();
     }
