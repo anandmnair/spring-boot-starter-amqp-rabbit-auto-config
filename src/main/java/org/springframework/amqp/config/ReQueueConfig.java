@@ -51,7 +51,7 @@ public class ReQueueConfig extends AbstractConfig {
             valid=false;
         }
         else {
-            valid=getExchange().validate()?valid:false;
+            valid=abstractConfig.validate()?valid:false;
         }
         return valid;
     }
