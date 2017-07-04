@@ -21,6 +21,8 @@ public class ReQueueConfig extends AbstractConfig {
 
     private QueueConfig queue;
 
+    private String routingKey;
+
     private String cron;
 
     private boolean autoRequeueEnabled;
@@ -32,6 +34,11 @@ public class ReQueueConfig extends AbstractConfig {
         valid=validate("exchange", exchange, valid);
 
         valid=validate("queue", queue, valid);
+
+        if(StringUtils.isEmpty(routingKey)) {
+            log.error("Invalid RoutingKey : RoutingKey must be provided for requeue configuration");
+            valid=false;
+        }
 
         if(autoRequeueEnabled && StringUtils.isEmpty(cron)) {
             log.error("Invalid Cron : Cron must be provided for auto requeue configuration");

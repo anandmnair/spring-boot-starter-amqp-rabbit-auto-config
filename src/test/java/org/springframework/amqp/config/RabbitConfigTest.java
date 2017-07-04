@@ -1,20 +1,17 @@
 package org.springframework.amqp.config;
 
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import java.util.HashMap;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.amqp.exception.AmqpAutoConfigurationException;
 import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.util.CollectionUtils;
+
+import java.util.HashMap;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.*;
 
 public class RabbitConfigTest {
 
@@ -295,7 +292,7 @@ public class RabbitConfigTest {
 	}
 
 	private ReQueueConfig createReQueueConfig(String exchange, String queue ) {
-		return ReQueueConfig.builder().exchange(createExchangeConfig(exchange)).queue(createQueueConfig(queue)).build();
+		return ReQueueConfig.builder().exchange(createExchangeConfig(exchange)).queue(createQueueConfig(queue)).routingKey("requeue.key").build();
 	}
 	
 	
