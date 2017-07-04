@@ -46,13 +46,14 @@ public class ReQueueConfig extends AbstractConfig {
     }
 
     private boolean validate(String key, AbstractConfig abstractConfig, boolean valid) {
+        boolean validFlag=valid;
         if(abstractConfig==null) {
             log.error("Invalid {} : {} must be provided for a requeue configuration", key, key);
-            valid=false;
+            validFlag=false;
         }
         else {
-            valid=abstractConfig.validate()?valid:false;
+            validFlag=abstractConfig.validate()?validFlag:false;
         }
-        return valid;
+        return validFlag;
     }
 }
