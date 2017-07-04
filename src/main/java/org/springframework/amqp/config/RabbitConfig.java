@@ -18,13 +18,15 @@ import java.util.Map.Entry;
 @ConfigurationProperties(prefix = "spring.rabbitmq.auto-config")
 public class RabbitConfig {
 
+	private boolean enabled=true;
+
 	private ExchangeConfig globalExchange;
 
 	private QueueConfig globalQueue;
 
 	private DeadLetterConfig deadLetterConfig;
-	
-	private boolean enabled=true;
+
+	private ReQueueConfig reQueueConfig;
 
 	@Singular
 	private Map<String, String> infoHeaders = new LinkedHashMap<>();
@@ -63,9 +65,13 @@ public class RabbitConfig {
 				valid=validate("DeadLetterConfig", deadLetterConfig, valid);
 			}
 		}
+		log.info("Validating ReQueueConfig...");
+		if(reQueueConfig!=null) {
+			valid=validate("ReQueueConfig", reQueueConfig, valid);
+		}
 		
 		if(valid) {
-			log.info("RabbitConfig Validation done succussfully. RabbitConfig = {{}}", this.toString());
+			log.info("RabbitConfig Validation done successfully. RabbitConfig = {{}}", this.toString());
 		}else {
 			throw new AmqpAutoConfigurationException("Invalid RabbitConfig Configuration");
 		}

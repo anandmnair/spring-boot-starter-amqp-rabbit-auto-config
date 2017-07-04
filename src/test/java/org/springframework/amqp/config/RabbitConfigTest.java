@@ -61,21 +61,33 @@ public class RabbitConfigTest {
 	}
 	
 	@Test
-	public void rabbitConfigWithValidExchangeAndQueueAndBindingTest() {
+	public void rabbitConfigWithValidExchangeAndQueueAndBindingAndDeadLetterAndRequeueTest() {
 		rabbitConfig=RabbitConfig.builder()
 				.globalExchange(createGlobalExchangeConfig())
 				.globalQueue(createGlobalQueueConfig())
 				.deadLetterConfig(createValidDeadLetterConfig())
+				.reQueueConfig(createReQueueConfig("requeue-exchange","requeue"))
 				.exchange(exchange, createExchangeConfig(exchange))
 				.queue(queue, createQueueConfig(queue))
 				.binding(binding, createBinding(exchange,queue,routingKey))
 				.build();
 		rabbitConfig.validate();
-		assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done succussfully")));
+		assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done successfully")));
 	}
 
-	private BindingConfig createBinding(String exchange, String queue, String routingKey) {
-		return BindingConfig.builder().exchange(exchange).queue(queue).routingKey(routingKey).build();
+	@Test(expected=AmqpAutoConfigurationException.class)
+	public void rabbitConfigWithValidExchangeAndQueueAndBindingAndDeadLetterAndInvalidRequeueTest() {
+		rabbitConfig=RabbitConfig.builder()
+				.globalExchange(createGlobalExchangeConfig())
+				.globalQueue(createGlobalQueueConfig())
+				.deadLetterConfig(createValidDeadLetterConfig())
+				.reQueueConfig(createReQueueConfig(null,"requeue"))
+				.exchange(exchange, createExchangeConfig(exchange))
+				.queue(queue, createQueueConfig(queue))
+				.binding(binding, createBinding(exchange,queue,routingKey))
+				.build();
+		rabbitConfig.validate();
+		assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done successfully")));
 	}
 
 	@Test(expected=AmqpAutoConfigurationException.class)
@@ -154,7 +166,7 @@ public class RabbitConfigTest {
 				.binding(binding, createBinding(exchange,queue,routingKey))
 				.build();
 		rabbitConfig.validate();
-		assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done succussfully")));
+		assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done successfully")));
 	}
 	
 	@Test
@@ -168,7 +180,7 @@ public class RabbitConfigTest {
 				.binding(binding, createBinding(exchange,queue,routingKey))
 				.build();
 		rabbitConfig.validate();
-		assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done succussfully")));
+		assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done successfully")));
 	}
 	
 	
@@ -210,7 +222,7 @@ public class RabbitConfigTest {
 				.binding(binding, createBinding(exchange,queue,routingKey))
 				.build();
 		rabbitConfig.validate();
-		assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done succussfully")));
+		assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done successfully")));
 	}
 	
 	
@@ -225,7 +237,7 @@ public class RabbitConfigTest {
 				.binding(binding, createBinding(exchange,queue,routingKey))
 				.build();
 		rabbitConfig.validate();
-		assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done succussfully")));
+		assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done successfully")));
 	}
 	
 
@@ -242,7 +254,7 @@ public class RabbitConfigTest {
 				.bindings(new HashMap<>())
 				.build();
 		rabbitConfig.validate();
-		assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done succussfully")));
+		assertThat(outputCapture.toString(),containsString(String.format("RabbitConfig Validation done successfully")));
 	}
 	
 	@Test(expected=AmqpAutoConfigurationException.class)
@@ -274,8 +286,16 @@ public class RabbitConfigTest {
 		return QueueConfig.builder().name(name).autoDelete(true).durable(false).deadLetterEnabled(true).build();
 	}
 
+	private BindingConfig createBinding(String exchange, String queue, String routingKey) {
+		return BindingConfig.builder().exchange(exchange).queue(queue).routingKey(routingKey).build();
+	}
+
 	private DeadLetterConfig createValidDeadLetterConfig() {
 		return DeadLetterConfig.builder().deadLetterExchange(ExchangeConfig.builder().name("dead-letter-exchange.dlx").build()).build();
+	}
+
+	private ReQueueConfig createReQueueConfig(String exchange, String queue ) {
+		return ReQueueConfig.builder().exchange(createExchangeConfig(exchange)).queue(createQueueConfig(queue)).build();
 	}
 	
 	
