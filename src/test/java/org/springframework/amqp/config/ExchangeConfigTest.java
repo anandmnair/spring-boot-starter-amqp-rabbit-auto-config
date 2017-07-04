@@ -47,7 +47,7 @@ public class ExchangeConfigTest {
 	}
 	
 	@Test
-	public void exchangeConfigeHashcodeTest() {
+	public void exchangeConfigHashcodeTest() {
 		assertThat(exchangeConfig.hashCode(),equalTo(expectedExchangeConfig.hashCode()));
 		exchangeConfig.setGlobalConfigApplied(false);
 		expectedExchangeConfig.setGlobalConfigApplied(true);
